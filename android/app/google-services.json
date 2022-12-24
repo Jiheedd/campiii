@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "1033120477659",
+    "project_id": "campii24",
+    "storage_bucket": "campii24.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1033120477659:android:dc7fd324598e615f2637fe",
+        "android_client_info": {
+          "package_name": "com.example.insta_clone"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1033120477659-42dk8v19otr4ah9jgc8loa43eqqka7eb.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.insta_clone",
+            "certificate_hash": "0cb92eaa9e1ed43fe63c3a56b2f11ca15746ad56"
+          }
+        },
+        {
+          "client_id": "1033120477659-4t9b591hoptp9qijvi1p5gaks1mrf8sv.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDOm14dnZbhK8TTGABX0RJVV4S9NZiz0fk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1033120477659-4t9b591hoptp9qijvi1p5gaks1mrf8sv.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
