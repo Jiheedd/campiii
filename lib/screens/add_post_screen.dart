@@ -9,6 +9,8 @@ import '../utils/size_config.dart';
 import '../utils/utils.dart';
 import 'package:provider/provider.dart';
 
+import 'feed_screen.dart';
+
 
 class AddPostScreen extends StatefulWidget {
   const AddPostScreen({Key? key}) : super(key: key);
@@ -89,6 +91,8 @@ class _AddPostScreenState extends State<AddPostScreen> {
           'Posted!',
         );
         clearImage();
+        clearTextFields();
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => FeedScreen(),));
       } else {
         showSnackBar(context, res);
       }
@@ -101,6 +105,13 @@ class _AddPostScreenState extends State<AddPostScreen> {
         err.toString(),
       );
     }
+  }
+
+  void clearTextFields() {
+    setState(() {
+      _titleController.clear();
+      _descriptionController.clear();
+    });
   }
 
   void clearImage() {
@@ -136,7 +147,7 @@ class _AddPostScreenState extends State<AddPostScreen> {
               title: const Text(
                 'Post to',
                 style: TextStyle(
-                  color: Colors.blueAccent,
+                  color: Colors.white,
                   fontWeight: FontWeight.bold,
                   fontSize: 16,
                 ),
@@ -191,7 +202,7 @@ class _AddPostScreenState extends State<AddPostScreen> {
                               ),
                             ),
                             SizedBox(
-                              height: MediaQuery.of(context).size.width * 0.15,
+                              height: SizeConfig.screenHeight * 0.15,
                             ),
                             SizedBox(
                               width: SizeConfig.screenWidth * 0.7,
@@ -239,21 +250,18 @@ class _AddPostScreenState extends State<AddPostScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                GestureDetector(
-                  child: IconButton(
-                    splashRadius: 20,
-                    color: Colors.white,
-                    onPressed: () async {
-                      //Navigator.pop(context);
-                      Uint8List file = await pickImage(ImageSource.gallery);
-                      setState(() {
-                        _file = file;
-                      });
-                    },
-                    //icon: SvgPicture.asset('assets/svg/gallery.svg')),
-                    icon: const Icon(Icons.image_outlined),
-                  ),
-                  onTap: () => _selectImage(context),
+                IconButton(
+                  splashRadius: 20,
+                  color: Colors.white,
+                  onPressed: () async {
+                    //Navigator.pop(context);
+                    Uint8List file = await pickImage(ImageSource.gallery);
+                    setState(() {
+                      _file = file;
+                    });
+                  },
+                  //icon: SvgPicture.asset('assets/svg/gallery.svg')),
+                  icon: const Icon(Icons.image_outlined),
                 ),
                 IconButton(
                   splashRadius: 20,

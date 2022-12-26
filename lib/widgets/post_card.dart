@@ -30,10 +30,12 @@ class PostCard extends StatefulWidget {
 class _PostCardState extends State<PostCard> {
   int commentLen = 0;
   bool isLikeAnimating = false;
+  late usermodel.UserModel user;
 
   @override
   void initState() {
     super.initState();
+    user = const usermodel.UserModel(username: "username", uid: "userID", photoUrl: "https://..", email: "example@gmail.com", bio: "Infinity Camp", followers: [], following: []);
     fetchCommentLen();
   }
 
@@ -67,8 +69,7 @@ class _PostCardState extends State<PostCard> {
 
   @override
   Widget build(BuildContext context) {
-    final usermodel.UserModel user = Provider.of<UserProvider>(context).getUser;
-
+    user = Provider.of<UserProvider>(context).getUser;
     return Container(
       // boundary needed for web
       decoration: BoxDecoration(
@@ -89,6 +90,7 @@ class _PostCardState extends State<PostCard> {
               horizontal: 16,
             ).copyWith(right: 0),
             child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
                 GestureDetector(
                   //heroTag: heroTag,
@@ -296,7 +298,22 @@ class _PostCardState extends State<PostCard> {
                                   icon: const Icon(
                                     Icons.send,
                                   ),
-                                  onPressed: () {}),
+                                  onPressed: () {
+
+                                  }
+                              ),
+                              //Spacer(),
+                              /*
+                              Expanded(
+                                  child: Align(
+                                    alignment: Alignment.Right,
+                                    child: IconButton(
+                                        icon: const Icon(Icons.bookmark_border),
+                                        onPressed: () {}
+                                    ),
+                                  )
+                              )
+                               */
                             ],
                           ),
                         ),
@@ -339,54 +356,6 @@ class _PostCardState extends State<PostCard> {
               ],
             ),
           ),
-          // LIKE, COMMENT SECTION OF THE POST
-          /*Row(
-            children: <Widget>[
-              /*LikeAnimation(
-                isAnimating: widget.snap['likes'].contains(user.uid),
-                smallLike: true,
-                child: IconButton(
-                  icon: widget.snap['likes'].contains(user.uid)
-                      ? const Icon(
-                          Icons.favorite,
-                          color: Colors.red,
-                        )
-                      : const Icon(
-                          Icons.favorite_border,
-                        ),
-                  onPressed: () => FireStoreMethods().likePost(
-                    widget.snap['postId'].toString(),
-                    user.uid,
-                    widget.snap['likes'],
-                  ),
-                ),
-              ),
-              IconButton(
-                icon: const Icon(
-                  Icons.comment_outlined,
-                ),
-                onPressed: () => Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => CommentsScreen(
-                      postId: widget.snap['postId'].toString(),
-                    ),
-                  ),
-                ),
-              ),
-              IconButton(
-                  icon: const Icon(
-                    Icons.send,
-                  ),
-                  onPressed: () {}),*/
-              Expanded(
-                  child: Align(
-                    alignment: Alignment.bottomRight,
-                    child: IconButton(
-                        icon: const Icon(Icons.bookmark_border),
-                        onPressed: () {}),
-                  ))
-            ],
-          ),*/
           //DESCRIPTION AND NUMBER OF COMMENTS
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -403,28 +372,7 @@ class _PostCardState extends State<PostCard> {
                       '${widget.snap['likes'].length} likes',
                       style: Theme.of(context).textTheme.bodyText2,
                     )),
-                /*Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.only(
-                    top: 8,
-                  ),
-                  child: RichText(
-                    text: TextSpan(
-                      style: const TextStyle(color: primaryColor),
-                      children: [
-                        TextSpan(
-                          text: widget.snap['username'].toString(),
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        TextSpan(
-                          text: ' ${widget.snap['description']}',
-                        ),
-                      ],
-                    ),
-                  ),
-                ),*/
+
                 InkWell(
                   child: Container(
                     padding: const EdgeInsets.symmetric(vertical: 4),
