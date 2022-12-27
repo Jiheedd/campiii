@@ -230,7 +230,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                         return Container(
                           child: Image(
-                            image: NetworkImage(snap['postUrl']),
+                            image: NetworkImage(snap['images'][0]),
                             fit: BoxFit.cover,
                           ),
                         );
