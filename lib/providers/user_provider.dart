@@ -1,6 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/widgets.dart';
 import '../models/user.dart';
 import '../resources/auth_methods.dart';
@@ -20,6 +17,10 @@ class UserProvider with ChangeNotifier{
     notifyListeners();
   }
 
-  UserModel get getUser => _user!;
+  UserModel get getUser {
+    print("user provider = ${_user!.username}");
+
+    return _user!;
+  }
       //??UserModel(username: FirebaseAuth.instance.currentUser!.displayName!, uid: FirebaseAuth.instance.currentUser!.uid, photoUrl: FirebaseAuth.instance.currentUser!.photoURL!, email: "email", bio: "bio", followers: [], following: []);
 }

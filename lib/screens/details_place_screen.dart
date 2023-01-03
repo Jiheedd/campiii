@@ -1,6 +1,3 @@
-import 'dart:io';
-import 'dart:typed_data';
-
 import '../utils/constants.dart';
 import '../utils/size_config.dart';
 import 'package:flutter/material.dart';
@@ -10,32 +7,107 @@ import 'package:carousel_slider/carousel_slider.dart';
 import '../models/place_model.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:map_launcher/map_launcher.dart';
-import 'package:share_plus/share_plus.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:path/path.dart';
+
 import 'package:screenshot/screenshot.dart';
 
 
 class DetailPlaceScreen extends StatefulWidget {
   final Place? place;
+  //Function onChangeLike;
+  bool isFavourite = false;
   late BuildContext? context;
 
-  DetailPlaceScreen({Key? key, this.place, this.context}) : super(key: key);
+  DetailPlaceScreen({
+    Key? key,
+    this.place,
+    required this.isFavourite,
+    //required this.onChangeLike,
+    this.context
+  }) : super(key: key);
 
   @override
   _DetailPlaceScreenState createState() => _DetailPlaceScreenState();
 }
 
 class _DetailPlaceScreenState extends State<DetailPlaceScreen> {
-  bool isFavourite = false;
-  List<int> imageBytes = [];
-  Uint8List? listBytes;
+
+  var array;
+  late List<String> images;
+  var box;
+  //final Directory directory = getApplicationDocumentsDirectory() as Directory;
   final screenshotController = ScreenshotController();
-  late Widget _screenshotDetailScreen;
+  // late Widget _screenshotDetailScreen;
+  late int activeIndex;
+
 
   @override
   void initState() {
-    _screenshotDetailScreen = Scaffold(
+    super.initState();
+    array = widget.place!.post!.Images;
+    images = List<String>.from(array);
+    box = widget.context!.findRenderObject() as RenderBox?;
+    activeIndex = 0;
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
+
+  Widget _buildInfoCard(String label, String info) {
+    return Container(
+      margin: const EdgeInsets.all(10.0),
+      width: 100.0,
+      decoration: BoxDecoration(
+        color: const Color(0xFFF8F2F7),
+        borderRadius: BorderRadius.circular(20.0),
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Text(
+            label,
+            style: const TextStyle(
+              fontFamily: 'Montserrat',
+              fontSize: 16.0,
+              fontWeight: FontWeight.w600,
+              color: DarkBlueColor,
+            ),
+          ),
+          const SizedBox(height: 8.0),
+          Text(
+            info,
+            style: TextStyle(
+              fontFamily: 'Montserrat',
+              fontSize: 16.0,
+              fontWeight: FontWeight.bold,
+              color: (info=="SAFE")?safeZoneColor:(info=="DANGER")?
+              dangerZoneColor : (info=="NORMAL")?
+              normalZoneColor : darkColor,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget buildIndicator() => AnimatedSmoothIndicator(
+    count: images.length,
+    activeIndex: activeIndex,
+    effect: JumpingDotEffect(
+      dotWidth: getProportionateScreenWidth(13),
+      dotHeight: getProportionateScreenWidth(13),
+      dotColor: kPrimaryLightColor.withOpacity(0.2),
+      jumpScale: 1.5
+    ),
+  );
+
+
+  @override
+  Widget build(BuildContext context) {
+
+    return Scaffold(
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -44,18 +116,18 @@ class _DetailPlaceScreenState extends State<DetailPlaceScreen> {
               children: <Widget>[
                 SafeArea(
                   child: CarouselSlider.builder(
-                      itemCount: widget.place!.images!.length,
+                      itemCount: images.length,
                       itemBuilder: (BuildContext context, int itemIndex, int pageViewIndex) {
                         activeIndex = itemIndex;
                         return Hero(
-                          tag: widget.place!.id!,
+                          tag: widget.place!.post!.postId,
                           child: Container(
                             width: double.infinity,
-                            height: 350.0,
+                            height: getProportionateScreenHeight(350),
                             decoration: BoxDecoration(
                               image: DecorationImage(
-                                image: AssetImage(
-                                  widget.place!.images![activeIndex],
+                                image: NetworkImage(
+                                  widget.place!.post!.Images[activeIndex],
                                 ),
                                 fit: BoxFit.cover,
                               ),
@@ -104,25 +176,24 @@ class _DetailPlaceScreenState extends State<DetailPlaceScreen> {
             ),
             SizedBox(height: getProportionateScreenHeight(20)),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 40.0),
+              padding: EdgeInsets.symmetric(horizontal: getProportionateScreenWidth(40)),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
                   Text(
-                    widget.place!.name!,
+                    widget.place!.post!.title,
                     style: const TextStyle(
                       fontFamily: 'Montserrat',
                       fontSize: 24.0,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  IconButton(
-                    icon: (isFavourite==false) ? const Icon(Icons.favorite_border) : const Icon(Icons.favorite),
-                    iconSize: 30.0,
-                    color: kPrimaryColor,
-                    onPressed: () => setState(() {
-                      isFavourite = !isFavourite;
-                    }),
+                  Icon(
+                    (widget.isFavourite==false) ? Icons.favorite_border : Icons.favorite,
+                    size: 30.0,
+                    color: kPrimaryLightColor,
+                    //color: (isFavourite==false) ? kPrimaryLightColor : loveColor,
+                    //onPressed: () {}
                   ),
                 ],
               ),
@@ -130,7 +201,7 @@ class _DetailPlaceScreenState extends State<DetailPlaceScreen> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 40.0),
               child: Text(
-                widget.place!.description!,
+                widget.place!.post!.description,
                 style: const TextStyle(
                   fontFamily: 'Montserrat',
                   fontSize: 16.0,
@@ -138,69 +209,36 @@ class _DetailPlaceScreenState extends State<DetailPlaceScreen> {
                 ),
               ),
             ),
+            /*Expanded(
+              child: SingleChildScrollView(
+                child: DescriptionTextWidget(text:"jdiejdeijjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj"
+                    "jdiejdijiejijdjee"
+                    "jdiejidjiejdijedje"
+                    ""
+                    ""
+                    "jidejiedjedijdeidejiedjjde"
+                    ""
+                    "djiejdijedidejidejdejdeijdeidejideijdeijedjed"),
+              ),
+            ),*/
             Container(
-              margin: const EdgeInsets.only(top: 30.0),
+              margin: EdgeInsets.only(top: getProportionateScreenHeight(30)),
               height: 120.0,
               child: ListView(
                 scrollDirection: Axis.horizontal,
                 children: <Widget>[
                   const SizedBox(width: 30.0),
                   _buildInfoCard('Comments', widget.place!.comments.toString()),
-                  _buildInfoCard('Category', "${widget.place!.category!}"),
-                  _buildInfoCard('Zone', widget.place!.zone!),
-                  _buildInfoCard('ID', widget.place!.id.toString()),
+                  _buildInfoCard('Category', "${places[0].category}"),
+                  _buildInfoCard('Zone', places[0].zone!),
+                  //_buildInfoCard('ID', widget.place!.post!.postId.toString()),
                 ],
               ),
             ),
-            /*Container(
-              margin: const EdgeInsets.only(left: 20.0, top: 30.0),
-              width: double.infinity,
-              height: 90.0,
-              decoration: const BoxDecoration(
-                color: Color(0xFFFFF2D0),
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(20.0),
-                  bottomLeft: Radius.circular(20.0),
-                ),
-              ),
-              child: ListTile(
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 20.0,
-                  vertical: 8.0,
-                ),
-                leading: CircleAvatar(
-                  child: ClipOval(
-                    child: Image(
-                      height: 40.0,
-                      width: 40.0,
-                      image: AssetImage(owner.image!),
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                ),
-                title: Text(
-                  owner.name!,
-                  style: const TextStyle(
-                    fontFamily: 'Montserrat',
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                subtitle: Text(
-                  'groupe',
-                  style: TextStyle(
-                    color: Theme.of(context).primaryColor,
-                    fontFamily: 'Montserrat',
-                  ),
-                ),
-                trailing: IconButton(
-                  onPressed: () => print('Share'),
-                  icon: const Icon(FontAwesomeIcons.peopleGroup),
-                ),
-              ),
-            ),*/
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 40.0, vertical: 25.0),
-              child: Text(
+
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: getProportionateScreenWidth(40), vertical: getProportionateScreenWidth(25)),
+              child: const Text(
                 "Description",
                 style: TextStyle(
                   fontFamily: 'Montserrat',
@@ -216,7 +254,7 @@ class _DetailPlaceScreenState extends State<DetailPlaceScreen> {
         ),
       ),
       bottomSheet: Padding(
-        padding: const EdgeInsets.fromLTRB(40.0, 0.0, 40.0, 20.0),
+        padding: EdgeInsets.symmetric(horizontal: getProportionateScreenHeight(40), vertical: getProportionateScreenWidth(25)),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: <Widget>[
@@ -224,21 +262,36 @@ class _DetailPlaceScreenState extends State<DetailPlaceScreen> {
               height: 50.0,
               width: 60.0,
               child: IconButton(
-                onPressed: () async{
-                  _onShareWithResult(widget.context!);
+                onPressed: () {
+                  //_onShare(widget.context!);
+                  //_onShareWithResult(widget.context!);
                 },
                 icon: const Icon(Icons.share),
               ),
             ),
             ElevatedButton.icon(
-              onPressed: () {
+              onPressed: () async {
+                final availableMaps = await MapLauncher.installedMaps;
+                print("Availible maps = $availableMaps}");
                 //MapUtils.openMap(36.80278, 10.17972);
-                //MapLauncher.showDirections(mapType: "mapType", destination: );
-                //MapsLauncher.launchCoordinates(37.2543799601, 10.0717163086, 'Google Map Cap Zebib');
+                //MapLauncher.showDirections(mapType: MapType.google, destination: Coords(36.80278, 10.17972));
+                MapLauncher.showDirections(mapType: availableMaps[0].mapType, destination: Coords(36.80278, 10.17972), destinationTitle: widget.place!.post!.title,);
+                /*if ((await MapLauncher.isMapAvailable(MapType.google))!) {
+                  await MapLauncher.showMarker(
+                    mapType: MapType.google,
+                    coords: Coords(36.80278, 10.17972),
+                    title: "title",
+                    description: "description",
+                  );
+                }*/
+
+                //MapLauncher.launchCoordinates(37.2543799601, 10.0717163086, 'Google Map Cap Zebib');
               },
               style: ElevatedButton.styleFrom(
+                backgroundColor: kPrimaryColor,
+                padding: EdgeInsets.symmetric(vertical: getProportionateScreenHeight(18), horizontal: getProportionateScreenWidth(20)),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(30.0)
+                    borderRadius: BorderRadius.circular(30.0)
                 ),
               ),
               icon: const Icon(
@@ -259,69 +312,57 @@ class _DetailPlaceScreenState extends State<DetailPlaceScreen> {
         ),
       ),
     );
-    super.initState();
   }
 
+ /* void _onShare(BuildContext context) async {
+    // A builder is used to retrieve the context immediately
+    // surrounding the ElevatedButton.
+    //
+    // The context's `findRenderObject` returns the first
+    // RenderObject in its descendent tree when it's not
+    // a RenderObjectWidget. The ElevatedButton's RenderObject
+    // has its position and size after it's built.
+    final box = context.findRenderObject() as RenderBox?;
 
-  Widget _buildInfoCard(String label, String info) {
-    return Container(
-      margin: const EdgeInsets.all(10.0),
-      width: 100.0,
-      decoration: BoxDecoration(
-        color: const Color(0xFFF8F2F7),
-        borderRadius: BorderRadius.circular(20.0),
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          Text(
-            label,
-            style: const TextStyle(
-              fontFamily: 'Montserrat',
-              fontSize: 16.0,
-              fontWeight: FontWeight.w600,
-              color: kPrimaryColor,
-            ),
-          ),
-          const SizedBox(height: 8.0),
-          Text(
-            info,
-            style: TextStyle(
-              fontFamily: 'Montserrat',
-              fontSize: 16.0,
-              fontWeight: FontWeight.bold,
-              color: (info=="SAFE")?safeZoneColor:(info=="DANGER")?
-              dangerZoneColor : (info=="NORMAL")?
-              normalZoneColor : darkColor,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  int activeIndex = 0;
-  Widget buildIndicator() => AnimatedSmoothIndicator(
-    count: widget.place!.images!.length,
-    activeIndex: activeIndex,
-    effect: const JumpingDotEffect(
-      dotWidth: 15,
-      dotHeight: 15,
-      dotColor: kPrimaryLightColor,
-      jumpScale: 1.5
-    ),
-  );
-
-
-  @override
-  Widget build(BuildContext context) {
-
-    return _screenshotDetailScreen;
+    if (images.isNotEmpty) {
+      final files = <XFile>[];
+      for (var i = 0; i < images.length; i++) {
+        files.add(XFile(images[i], name: "${widget.place!.post!.title} 1"));
+      }
+      Share.shareXFiles(files,
+          text: widget.place!.post!.title,
+          subject: widget.place!.post!.description,
+          //sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size
+      );
+    } else {
+      await Share.share(widget.place!.post!.title,
+          subject: widget.place!.post!.description,
+          sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size);
+    }
   }
 
   void _onShareWithResult(BuildContext context) async {
-    final box = context.findRenderObject() as RenderBox?;
     final Directory directory = await getApplicationDocumentsDirectory();
+
+    final box = context.findRenderObject() as RenderBox?;
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
+    ShareResult shareResult;
+    if (images.isNotEmpty) {
+      final files = <XFile>[];
+      for (var i = 0; i < images.length; i++) {
+        files.add(XFile(images[i], name: "${widget.place!.post!.title} 1"));
+      }
+      shareResult = await Share.shareXFiles(files,
+          text: widget.place!.post!.title,
+          subject: widget.place!.post!.description,
+          sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size);
+    } else {
+      shareResult = await Share.shareWithResult(widget.place!.post!.title,
+          subject: widget.place!.post!.description,
+          sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size);
+    }
+    scaffoldMessenger.showSnackBar(getResultSnackBar(shareResult));
+
 
     Directory(directory.path).create(recursive: true).then((dir) {
       print("dir = ${dir.path}");
@@ -343,22 +384,21 @@ class _DetailPlaceScreenState extends State<DetailPlaceScreen> {
     });
   }
 
-  FlatButton(double _height, double _width) {
-  final ButtonStyle flatButtonStyle = TextButton.styleFrom(
-    minimumSize: Size(_width, _height),
-    backgroundColor: Colors.grey,
-    padding: EdgeInsets.all(0),
-  );
-  return TextButton(
-    style: flatButtonStyle,
-    onPressed: () {},
-    child: Text(
-    "some text",
-    style: TextStyle(color: Colors.white),
-    ),
-  );
-}
+  SnackBar getResultSnackBar(ShareResult result) {
+    return SnackBar(
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text("Share result: ${result.status}"),
+          if (result.status == ShareResultStatus.success)
+            Text("Shared to: ${result.raw}")
+        ],
+      ),
+    );
+  }
 
+*/
 }
 
 

@@ -6,8 +6,8 @@ class Post {
   final String uid;
   final likes;
   final String postId;
-  final DateTime datePublished;
-  final List<String> Images;
+  final datePublished;
+  final List<dynamic> Images;
 
   const Post({
       required this.title,
