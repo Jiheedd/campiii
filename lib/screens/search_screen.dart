@@ -96,7 +96,7 @@ class _SearchScreenState extends State<SearchScreen> {
                   crossAxisSpacing: 8.0,
                   itemCount: (snapshot.data! as dynamic).docs.length,
                   itemBuilder: (context, index) => Image.network(
-                    (snapshot.data! as dynamic).docs[index]['postUrl'],
+                    (snapshot.data! as dynamic).docs[index]['images'][0],
                     fit: BoxFit.cover,
                   ),
               /*

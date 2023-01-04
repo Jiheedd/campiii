@@ -81,7 +81,7 @@ class _ViewPosts extends State<PostCardSecond> {
 
 
     final usermodel.UserModel user = Provider.of<UserProvider>(context).getUser;
-    final List<String> listImages = widget.snap["images"];
+    final List listImages = widget.snap["images"];
     final time =  timeago.format(widget.snap["datePublished"], locale: 'es');
 
     return Padding(
