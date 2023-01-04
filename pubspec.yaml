@@ -52,6 +52,7 @@ dependencies:
   timeago: ^3.3.0
   google_fonts: ^3.0.1
   flip_card: ^0.6.0
+  palette_generator: ^0.3.3+2
 
 dev_dependencies:
   flutter_test:

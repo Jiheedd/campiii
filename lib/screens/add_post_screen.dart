@@ -1,6 +1,5 @@
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:image_picker/image_picker.dart';
 import '../providers/user_provider.dart';
 import '../resources/firestore_methods.dart';
@@ -22,13 +21,13 @@ class AddPostScreen extends StatefulWidget {
 class _AddPostScreenState extends State<AddPostScreen> {
   Uint8List? _file;
   bool isLoading = false;
-  final _keyForm = GlobalKey<FormState>();
+  //final _keyForm = GlobalKey<FormState>();
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
 
   // Not Used for now
   // *******************
-  _selectImage(BuildContext parentContext) async {
+  /*_selectImage(BuildContext parentContext) async {
     return showDialog(
       context: parentContext,
       builder: (BuildContext context) {
@@ -66,7 +65,7 @@ class _AddPostScreenState extends State<AddPostScreen> {
         );
       },
     );
-  }
+  }*/
   // ********************
 
   void postImage(String uid) async {
@@ -125,7 +124,7 @@ class _AddPostScreenState extends State<AddPostScreen> {
     super.dispose();
     _titleController.dispose();
     _descriptionController.dispose();
-    UserProvider().refreshUser();
+    //UserProvider().refreshUser();
   }
 
 
@@ -137,13 +136,13 @@ class _AddPostScreenState extends State<AddPostScreen> {
     return Scaffold(
             appBar: AppBar(
               backgroundColor: mobileBackgroundColor,
-              leading: IconButton(
+              /*leading: IconButton(
                 icon: const Icon(Icons.arrow_back),
                 onPressed: () {
-                  //Navigator.of(context).pop(true);
-                  clearImage;
+                  //Navigator.of(context).pop();
+                  //clearImage;
                 },
-              ),
+              ),*/
               title: const Text(
                 'Post to',
                 style: TextStyle(
